@@ -662,6 +662,29 @@ function loadGuessIcons() {
   lGuessIcons.forEach((el) => el.addEventListener("click", flipGuess));
 }
 
+function GetRandomIndex(MaxExclusive) {
+  if (!Number.isInteger(MaxExclusive) || MaxExclusive <= 0) {
+    return 0;
+  }
+
+  if (window.crypto && window.crypto.getRandomValues) {
+    const RandomArray = new Uint32Array(1);
+    const MaxUint32 = 0x100000000;
+    const Limit = MaxUint32 - (MaxUint32 % MaxExclusive);
+
+    let RandomValue = 0;
+
+    do {
+      window.crypto.getRandomValues(RandomArray);
+      RandomValue = RandomArray[0];
+    } while (RandomValue >= Limit);
+
+    return RandomValue % MaxExclusive;
+  }
+
+  return Math.floor(Math.random() * MaxExclusive);
+}
+
 async function startGame() {
   // If the game is already loading, exit to avoid doubling up
   if (gameLoading)
@@ -701,7 +724,8 @@ async function startGame() {
   updateNumChars();
 
   // Randomly determine the player's character and set it up
-  yourCharIndex = Math.floor(Math.random() * getNumChars());
+  // yourCharIndex = Math.floor(Math.random() * getNumChars());
+  yourCharIndex = GetRandomIndex(getNumChars());
   const yourCharInfo = lCharInfo[yourCharIndex];
   YOUR_CHAR_NAME.textContent = yourCharInfo.name;
   YOUR_CHAR_IMG_FRAME.value = yourCharInfo.name;
